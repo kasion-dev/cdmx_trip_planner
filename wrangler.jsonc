@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "cdmx-trip",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "routes": [{ "pattern": "cdmx.kasion.dev", "custom_domain": true }],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  // Shared with money.kasion.dev and mexico.kasion.dev; schema lives in the
+  // kasidit-money repo. This Worker only reads/writes the "mexico_state" row.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "kasidit-money-db",
+      "database_id": "7f58ec5b-24b8-4885-a838-67a6c1f6f6db"
+    }
+  ],
+  "vars": {
+    "FIREBASE_PROJECT_ID": "kasion-dev",
+    "OWNER_MATCH": "kasidit"
+  },
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>CDMX เดินเที่ยว</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#c2185b">
+<meta name="apple-mobile-web-app-title" content="CDMX">
+<meta name="description" content="แผนเดินเที่ยวเม็กซิโกซิตี้ 2 คน: เส้นทางเดินพร้อม Google Maps, รายการสถานที่, และเครื่องคิดงบ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6f0; --surface: #ffffff; --surface-2: #f3ece2; --ink: #22201c; --muted: #6b645a; --line: #e7ddd0;
+    --rosa: #c2185b; --terra: #c4552c; --teal: #0f766e; --gold: #b7791f;
+    --accent: var(--teal); --accent-ink: #fff; --chip: #eef6f5;
+    --shadow: 0 1px 2px rgba(34,32,28,.06), 0 8px 24px rgba(34,32,28,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14120f; --surface: #1d1a16; --surface-2: #26221d; --ink: #f2ede6; --muted: #a89f93; --line: #332e27;
+      --rosa: #f06292; --terra: #f08a5d; --teal: #2dd4bf; --gold: #f6c453;
+      --accent: var(--teal); --accent-ink: #062521; --chip: #18302d;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.65 "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  /* hero */
+  .hero { position: relative; overflow: hidden; color: #fff;
+    background: linear-gradient(135deg, var(--rosa) 0%, var(--terra) 55%, var(--gold) 100%); }
+  .hero::after { content: ""; position: absolute; inset: 0; opacity: .14;
+    background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0); background-size: 18px 18px; }
+  .hero .wrap { position: relative; z-index: 1; padding-top: 48px; padding-bottom: 40px; }
+  .eyebrow { letter-spacing: .14em; text-transform: uppercase; font-size: .78rem; font-weight: 600; opacity: .9; }
+  .hero h1 { font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.1; margin: 8px 0 10px; font-weight: 700; }
+  .hero p { margin: 0; max-width: 620px; opacity: .95; }
+  .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 26px; max-width: 560px; }
+  .hero-stats div { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); border-radius: 14px; padding: 10px 12px; backdrop-filter: blur(4px); }
+  .hero-stats b { display: block; font-size: 1.35rem; line-height: 1.2; }
+  .hero-stats span { font-size: .8rem; opacity: .9; }
+
+  /* nav */
+  nav.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  nav.top .wrap { display: flex; gap: 6px; overflow-x: auto; padding-top: 10px; padding-bottom: 10px; scrollbar-width: none; }
+  nav.top a { text-decoration: none; white-space: nowrap; font-size: .9rem; padding: 6px 12px; border-radius: 999px; color: var(--muted); border: 1px solid transparent; }
+  nav.top a:hover { color: var(--ink); border-color: var(--line); background: var(--surface); }
+
+  section { padding: 34px 0 6px; }
+  h2 { font-size: 1.45rem; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
+  .grid { display: grid; gap: 14px; }
+  @media (min-width: 780px) { .g2 { grid-template-columns: 1.15fr .85fr; } .g3 { grid-template-columns: repeat(3, 1fr); } }
+  .note { color: var(--muted); font-size: .86rem; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: .76rem; padding: 2px 10px; border-radius: 999px; background: var(--chip); color: var(--accent); border: 1px solid var(--line); }
+  .chip.warn { color: var(--terra); }
+
+  /* controls */
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+  .btn { font: inherit; font-size: .9rem; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); }
+  .btn[aria-pressed="true"], .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .field { margin-top: 14px; }
+  .field .lab { display: flex; justify-content: space-between; font-size: .92rem; }
+  .field .lab b { font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0 0; }
+  .inputs { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 16px; }
+  .inputs label { font-size: .85rem; color: var(--muted); }
+  input[type=number], input[type=search] { width: 100%; padding: 8px 10px; font: inherit; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); margin-top: 4px; }
+  .big { font-size: 2rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .big + .note { margin-top: 2px; }
+  .meter { height: 8px; border-radius: 6px; background: var(--surface-2); overflow: hidden; margin-top: 6px; }
+  .meter > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--teal), var(--gold)); transition: width .3s; }
+  .stack > * + * { margin-top: 14px; }
+  .bars .b { display: grid; grid-template-columns: 70px 1fr 92px; gap: 10px; align-items: center; margin: 10px 0; font-size: .9rem; }
+  .bars em { font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* routes */
+  .route h3 { margin: 6px 0 2px; font-size: 1.12rem; }
+  .route .meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+  ol.tl { list-style: none; margin: 0 0 14px; padding: 0 0 0 18px; border-left: 2px dashed var(--line); }
+  ol.tl li { position: relative; padding: 4px 0 4px 10px; }
+  ol.tl li::before { content: ""; position: absolute; left: -25px; top: 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 3px solid var(--terra); }
+  ol.tl li:first-child::before { border-color: var(--teal); }
+  ol.tl li:last-child::before { border-color: var(--rosa); }
+  .route .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--rosa), var(--terra)); }
+
+  /* places */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .toolbar input { max-width: 260px; margin: 0; }
+  .grp { margin: 22px 0 6px; font-weight: 700; color: var(--terra); font-size: .95rem; }
+  ul.places { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  @media (min-width: 780px) { ul.places { grid-template-columns: 1fr 1fr; } }
+  ul.places li { display: flex; gap: 10px; align-items: flex-start; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  ul.places input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+  ul.places label { flex: 1; cursor: pointer; }
+  ul.places .t { font-weight: 500; }
+  ul.places li.done { opacity: .62; }
+  ul.places li.done .t { text-decoration: line-through; }
+  ul.places a.map { flex: none; font-size: .82rem; text-decoration: none; color: var(--accent); padding: 3px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+
+  .tips { display: grid; gap: 12px; }
+  @media (min-width: 780px) { .tips { grid-template-columns: repeat(3, 1fr); } }
+  .tip b { display: block; margin-bottom: 2px; }
+  footer { padding: 34px 0 54px; color: var(--muted); font-size: .85rem; }
+
+  /* account + login gate (shared Gmail login with mexico.kasion.dev) */
+  nav.top .wrap { align-items: center; }
+  .acct { margin-left: auto; display: none; align-items: center; gap: 6px; flex: none; }
+  .acct.on { display: flex; }
+  .acct img { width: 28px; height: 28px; border-radius: 50%; }
+  .acct .sync { font-size: .75rem; color: var(--muted); white-space: nowrap; }
+  .acct .sync.warn { color: var(--terra); }
+  .acct button { font: inherit; font-size: .8rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+  .gate { padding: 40px 0 60px; }
+  .gate .card { max-width: 440px; margin: 0 auto; text-align: center; }
+  .gate h2 { margin-bottom: 6px; }
+  .gate .btn { margin-top: 14px; font-size: 1rem; padding: 10px 18px; }
+  .gate .err { color: var(--terra); margin-top: 10px; font-size: .86rem; min-height: 1.2em; }
+  body.locked main.wrap, body.locked nav.top a { display: none; }
+  body:not(.locked) .gate { display: none; }
+  ul.places .when { color: var(--teal); font-size: .8rem; }
+</style>
+</head>
+<body class="locked">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Ciudad de México · เดินเที่ยว 2 คน</div>
+    <h1>CDMX เดินเที่ยว</h1>
+    <p>เส้นทางเดิน 3 วันพร้อมเปิดใน Google Maps ได้ทันที รายการสถานที่ 40 จุด ติ๊กเก็บได้ และเครื่องคิดงบเที่ยวระยะยาว</p>
+    <div class="hero-stats">
+      <div><b>3</b><span>เส้นทางเดิน</span></div>
+      <div><b>40</b><span>สถานที่</span></div>
+      <div><b>$5</b><span>Metro ต่อเที่ยว</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="top" aria-label="สารบัญ">
+  <div class="wrap">
+    <a href="#routes">เส้นทางเดิน</a>
+    <a href="#places">สถานที่</a>
+    <a href="#budget">คิดงบ</a>
+    <a href="#tips">เคล็ดลับ</a>
+    <a href="https://mexico.kasion.dev">Mexico ↗</a>
+    <div class="acct" id="acct">
+      <span class="sync" id="syncTxt"></span>
+      <img id="acctImg" alt="" referrerpolicy="no-referrer" hidden>
+      <button type="button" id="signOut">ออก</button>
+    </div>
+  </div>
+</nav>
+
+<div class="gate wrap" id="gate">
+  <div class="card">
+    <h2>เข้าสู่ระบบก่อน</h2>
+    <p class="note" id="gateTxt">ใช้ Gmail เดียวกับ mexico.kasion.dev ที่ไปแล้วและงบเที่ยวจะเป็นข้อมูลชุดเดียวกันทั้งสองเว็บ</p>
+    <button type="button" class="btn primary" id="signIn" disabled>เข้าสู่ระบบด้วย Gmail</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section id="routes">
+    <h2>เส้นทางเดิน 3 วัน</h2>
+    <p class="lead">กดปุ่มเพื่อเปิดเส้นทางเดินใน Google Maps ระยะทางเป็นค่าประมาณ</p>
+    <div class="grid g3" id="routeCards"></div>
+  </section>
+
+  <section id="places">
+    <h2>สถานที่เที่ยว CDMX</h2>
+    <p class="lead">จัดตามย่าน ติ๊กเมื่อไปแล้ว ซิงก์กับแท็บที่เที่ยวใน mexico.kasion.dev</p>
+    <div class="card">
+      <div class="toolbar">
+        <div class="presets" id="filters" role="group" aria-label="ตัวกรอง"></div>
+        <input type="search" id="q" placeholder="ค้นหาสถานที่" aria-label="ค้นหาสถานที่">
+      </div>
+      <div class="meter"><i id="progress"></i></div>
+      <div class="note" id="progressTxt" style="margin-top:6px"></div>
+      <div id="placeList"></div>
+      <p class="note" style="margin-top:16px">รวมจุดเด่นของเมือง ไม่ใช่ทุกที่ (CDMX มีพิพิธภัณฑ์หลายร้อยแห่ง) ที่เขียนว่า "ตรวจราคา" ยังไม่ได้ตรวจ ดูเว็บทางการหรือหน้างานก่อนไป พิพิธภัณฑ์ส่วนใหญ่ปิดวันจันทร์</p>
+    </div>
+  </section>
+
+  <section id="budget">
+    <h2>คิดงบเที่ยวระยะยาว</h2>
+    <p class="lead">ปรับจำนวนครั้งและค่าใช้จ่าย ดูยอดต่อเดือนและยอดรวม เป็นเปโซและบาท</p>
+    <div class="grid g2">
+      <div class="card">
+        <div class="presets" id="presets" role="group" aria-label="ชุดค่าสำเร็จรูป"></div>
+        <div class="field"><div class="lab"><span>เที่ยวแบบมีค่าใช้จ่าย (ครั้ง/เดือน)</span><b id="vA"></b></div><input type="range" id="countA" min="0" max="8" step="1"></div>
+        <div class="field"><div class="lab"><span>ค่าใช้จ่ายต่อครั้ง (2 คน, เปโซ)</span><b id="vCostA"></b></div><input type="range" id="costA" min="150" max="1500" step="50"></div>
+        <div class="field"><div class="lab"><span>เดินเที่ยวแบบประหยัด (ครั้ง/เดือน)</span><b id="vB"></b></div><input type="range" id="countB" min="0" max="8" step="1"></div>
+        <div class="field"><div class="lab"><span>ค่าใช้จ่ายต่อครั้งแบบประหยัด</span><b id="vCostB"></b></div><input type="range" id="costB" min="0" max="500" step="10"></div>
+        <div class="field"><div class="lab"><span>ระยะเวลา</span><b id="vM"></b></div><input type="range" id="months" min="1" max="36" step="1"></div>
+        <div class="inputs">
+          <label>เงินที่ใช้ได้ต่อเดือน (เปโซ)<input type="number" id="freeCash" min="0" step="100" placeholder="ไม่บังคับ"></label>
+          <label>เป้าหมายที่อยากเทียบ (บาท)<input type="number" id="goalThb" min="0" step="1000" placeholder="ไม่บังคับ"></label>
+          <label>บาทต่อ 1 เปโซ<input type="number" id="rate" min="0.5" max="5" step="0.01"></label>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card"><div class="big" id="monthly">–</div><div class="note">ต่อเดือน</div></div>
+        <div class="card"><div class="big" id="total">–</div><div class="note" id="totalNote"></div></div>
+        <div class="card">
+          <div id="pctFree" class="note"></div><div class="meter"><i id="meterFree"></i></div>
+          <div id="pctGoal" class="note" style="margin-top:12px"></div><div class="meter"><i id="meterGoal"></i></div>
+        </div>
+        <div class="card bars" id="bars"></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px">ค่าใช้จ่ายต่อครั้งเป็นประมาณการ ค่าเข้าปราสาท Chapultepec $210 ต่อคนสำหรับชาวต่างชาติ ถ้าจะไปให้ตั้งค่าต่อครั้งเผื่อไว้</p>
+  </section>
+
+  <section id="tips">
+    <h2>เคล็ดลับเดิน</h2>
+    <p class="lead">&nbsp;</p>
+    <div class="tips">
+      <div class="card tip"><b>ความสูง ~2,240 ม.</b><span class="note">เหนื่อยง่ายช่วงแรก เดินช้า ๆ ดื่มน้ำ พักบ่อย</span></div>
+      <div class="card tip"><b>วันจันทร์พิพิธภัณฑ์ปิด</b><span class="note">ส่วนใหญ่เปิดอังคาร–อาทิตย์ เช็กก่อนไป</span></div>
+      <div class="card tip"><b>ฟรีวันอาทิตย์ (บางที่)</b><span class="note">สำหรับชาวเม็กซิกันและ residente ที่มีหลักฐาน นักท่องเที่ยวยังจ่ายปกติ</span></div>
+      <div class="card tip"><b>Metro ขากลับ</b><span class="note">$5 ต่อเที่ยวต่อคน เดินขาไป นั่ง Metro กลับ ประหยัดแรง</span></div>
+      <div class="card tip"><b>อากาศเปลี่ยนเร็ว</b><span class="note">กลางวันอุ่น กลางคืนเย็น พกเสื้อบาง ๆ ช่วงฝนพกร่ม</span></div>
+      <div class="card tip"><b>ปลอดภัยไว้ก่อน</b><span class="note">โหลดแผนที่ออฟไลน์ เก็บมือถือเมื่อคนแน่น เดินถนนหลักช่วงค่ำ</span></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">ตัวเลขและระยะทางเป็นค่าประมาณเพื่อวางแผน ตรวจราคาและเวลาเปิดจากแหล่งทางการก่อนไปจริง ที่ติ๊กและงบที่ตั้งไว้เก็บในบัญชี Gmail ของคุณ ใช้ร่วมกับ mexico.kasion.dev</div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var CITY = ", Ciudad de México";
+  function q(s) { return encodeURIComponent(s + CITY); }
+  function dirUrl(stops, fromMe) {
+    var pts = fromMe ? stops : stops.slice(1);
+    var url = "https://www.google.com/maps/dir/?api=1&travelmode=walking";
+    if (!fromMe) url += "&origin=" + q(stops[0]);
+    url += "&destination=" + q(pts[pts.length - 1]);
+    var w = pts.slice(0, -1);
+    if (w.length) url += "&waypoints=" + w.map(q).join("%7C");
+    return url;
+  }
+  function searchUrl(s) { return "https://www.google.com/maps/search/?api=1&query=" + q(s); }
+
+  var ROUTES = [
+    { n: 1, title: "Polanco → Chapultepec", km: "~5–7 กม.", tags: [["ปราสาทปิดวันจันทร์", "warn"], ["ปราสาท $210/คน", ""]],
+      stops: ["Parque Lincoln, Polanco", "Lago de Chapultepec", "Castillo de Chapultepec", "Museo Nacional de Antropología"],
+      labels: ["Parque Lincoln และ Av. Masaryk", "ทะเลสาบ Bosque de Chapultepec", "Castillo de Chapultepec (9:00–17:00)", "Museo Nacional de Antropología (ทางเลือก)"] },
+    { n: 2, title: "Reforma → Centro Histórico", km: "~6–8 กม.", tags: [["ฟรีเกือบทั้งหมด", ""], ["Metro กลับ $5", ""]],
+      stops: ["Puerta de los Leones, Bosque de Chapultepec", "Ángel de la Independencia", "Alameda Central", "Palacio de Bellas Artes", "Calle Francisco I. Madero", "Zócalo"],
+      labels: ["ประตู Chapultepec ฝั่ง Reforma", "Ángel de la Independencia", "Alameda Central", "Palacio de Bellas Artes (ชมภายนอก)", "ถนนคนเดิน Madero", "Zócalo"] },
+    { n: 3, title: "Roma → Condesa", km: "~4–6 กม.", tags: [["คาเฟ่และตลาด", ""], ["ค่าอาหารเป็นหลัก", ""]],
+      stops: ["Plaza Río de Janeiro, Roma Norte", "Mercado Roma", "Parque España", "Parque México"],
+      labels: ["Plaza Río de Janeiro", "Mercado Roma (แวะกิน)", "Parque España", "Parque México"] }
+  ];
+
+  var G = {
+    A: "Chapultepec และ Polanco",
+    B: "Reforma และ Centro Histórico",
+    C: "Roma, Condesa, Juárez",
+    D: "Coyoacán, San Ángel และย่านใต้",
+    E: "นอกย่านกลาง ต้องนั่งรถ"
+  };
+  var PLACES = [
+    ["A", "home", "Bosque de Chapultepec รอบทะเลสาบ", "ฟรี", "Lago de Chapultepec"],
+    ["A", "home", "Castillo de Chapultepec (Museo Nacional de Historia)", "$210 ต่อคน (ต่างชาติ) · ปิดวันจันทร์", "Castillo de Chapultepec"],
+    ["A", "home", "Museo Nacional de Antropología", "ตรวจราคา · ปิดวันจันทร์", "Museo Nacional de Antropología"],
+    ["A", "home", "Museo del Caracol (Galería de Historia)", "ตรวจราคา", "Museo del Caracol Galería de Historia"],
+    ["A", "home", "Museo de Arte Moderno", "ตรวจราคา", "Museo de Arte Moderno"],
+    ["A", "home", "Museo Tamayo", "ตรวจราคา", "Museo Tamayo"],
+    ["A", "home", "Zoológico de Chapultepec", "ตรวจราคา", "Zoológico de Chapultepec"],
+    ["A", "home", "Museo Soumaya และ Museo Jumex (Plaza Carso)", "ตรวจราคา", "Museo Soumaya Plaza Carso"],
+    ["A", "home", "Parque Lincoln และ Av. Masaryk", "ฟรี", "Parque Lincoln Polanco"],
+    ["B", "area", "Paseo de la Reforma และ Ángel de la Independencia", "ฟรี", "Ángel de la Independencia"],
+    ["B", "area", "Alameda Central", "ฟรี", "Alameda Central"],
+    ["B", "area", "Palacio de Bellas Artes", "ภายนอกฟรี · ด้านในตรวจราคา", "Palacio de Bellas Artes"],
+    ["B", "area", "Torre Latinoamericana (จุดชมวิว)", "ตรวจราคา", "Torre Latinoamericana"],
+    ["B", "area", "Casa de los Azulejos", "ตรวจ", "Casa de los Azulejos"],
+    ["B", "area", "ถนนคนเดิน Madero", "ฟรี", "Calle Francisco I. Madero"],
+    ["B", "area", "Zócalo (Plaza de la Constitución)", "ฟรี", "Zócalo"],
+    ["B", "area", "Catedral Metropolitana", "ตรวจ", "Catedral Metropolitana de la Ciudad de México"],
+    ["B", "area", "Palacio Nacional (จิตรกรรม Diego Rivera)", "ตรวจเงื่อนไขการเข้าชม", "Palacio Nacional"],
+    ["B", "area", "Templo Mayor และพิพิธภัณฑ์", "ตรวจราคา", "Museo del Templo Mayor"],
+    ["B", "area", "Museo de Arte Popular", "ตรวจราคา", "Museo de Arte Popular"],
+    ["B", "area", "Museo Mural Diego Rivera", "ตรวจราคา", "Museo Mural Diego Rivera"],
+    ["B", "area", "Monumento a la Revolución", "ตรวจ (จุดชมวิว)", "Monumento a la Revolución"],
+    ["B", "area", "Plaza Garibaldi", "เดินชมฟรี · ดนตรีคิดเงิน", "Plaza Garibaldi"],
+    ["B", "area", "Biblioteca Vasconcelos", "ตรวจ", "Biblioteca Vasconcelos"],
+    ["C", "area", "Roma Norte เดินชมอาคารและคาเฟ่", "ฟรี", "Roma Norte"],
+    ["C", "area", "Plaza Río de Janeiro", "ฟรี", "Plaza Río de Janeiro"],
+    ["C", "area", "Parque México และ Parque España", "ฟรี", "Parque México"],
+    ["C", "area", "Mercado Roma", "ค่าอาหาร", "Mercado Roma"],
+    ["C", "area", "Zona Rosa และ Colonia Juárez", "เดินชมฟรี", "Zona Rosa"],
+    ["D", "area", "Centro de Coyoacán และ Jardín Centenario", "ฟรี", "Jardín Centenario Coyoacán"],
+    ["D", "area", "Mercado de Coyoacán", "ค่าอาหาร", "Mercado de Coyoacán"],
+    ["D", "area", "Museo Frida Kahlo (Casa Azul)", "ตรวจราคา · ต้องจองล่วงหน้า", "Museo Frida Kahlo"],
+    ["D", "area", "Museo Casa de León Trotsky", "ตรวจราคา", "Museo Casa de León Trotsky"],
+    ["D", "area", "San Ángel: Plaza San Jacinto", "ตรวจวันเปิดตลาด", "Plaza San Jacinto San Ángel"],
+    ["D", "area", "Museo Casa Estudio Diego Rivera y Frida Kahlo", "ตรวจราคา", "Museo Casa Estudio Diego Rivera y Frida Kahlo"],
+    ["D", "area", "UNAM Ciudad Universitaria", "ภายนอกฟรี", "Biblioteca Central UNAM"],
+    ["E", "far", "Xochimilco (เรือ trajinera)", "ตรวจราคา", "Embarcadero Nuevo Nativitas Xochimilco"],
+    ["E", "far", "Museo Anahuacalli", "ตรวจราคา", "Museo Anahuacalli"],
+    ["E", "far", "Basílica de Guadalupe", "ฟรีเข้าบริเวณ", "Basílica de Santa María de Guadalupe"],
+    ["E", "far", "Teotihuacán (นอกเมือง ~50 กม.)", "ตรวจราคา · ต้องนั่งรถ", "Zona Arqueológica de Teotihuacán"]
+  ].map(function (r) { return { g: r[0], t: r[1], n: r[2], c: r[3], m: r[4] }; });
+
+  var FILTERS = [["all", "ทั้งหมด"], ["home", "ใกล้ Polanco"], ["area", "Metro ไปแล้วเดิน"], ["far", "ต้องนั่งรถ"], ["todo", "ยังไม่ไป"]];
+  var DEFAULTS = { countA: 3, costA: 600, countB: 0, costB: 250, months: 24, freeCash: 0, goalThb: 0, rate: 1.82 };
+  var PRESETS = [
+    { id: "cheap", name: "ประหยัด", sub: "3×$400", v: { countA: 3, costA: 400, countB: 0 } },
+    { id: "normal", name: "ปกติ", sub: "3×$600", v: { countA: 3, costA: 600, countB: 0 } },
+    { id: "comfy", name: "สบาย", sub: "3×$900", v: { countA: 3, costA: 900, countB: 0 } },
+    { id: "mix", name: "ผสม", sub: "1 จ่าย + 2 ประหยัด", v: { countA: 1, costA: 600, countB: 2, costB: 250 } }
+  ];
+  var KEY = "cdmx_walk_v2";
+  var state, done, dates = {}, filter = "all", query = "";
+  var BASE_COUNT = PLACES.length;
+  G.X = "เพิ่มเองใน mexico.kasion.dev";
+  var TH_M = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  function todayIso() { return new Date().toLocaleDateString("en-CA"); }
+  function thDate(iso) { var p = String(iso).split("-").map(Number); return p[2] + " " + TH_M[p[1] - 1] + " " + String(p[0]).slice(2); }
+  function syncTrip() { if (window.CDMX_SYNC) window.CDMX_SYNC.trip(state); }
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function fmt(n) { return Math.round(n).toLocaleString("en-US"); }
+  function load() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+    state = Object.assign({}, DEFAULTS, s && s.state || {});
+    done = s && s.done || {};
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify({ state: state, done: done })); } catch (e) {} }
+  function monthlyOf(s) { return s.countA * s.costA + s.countB * s.costB; }
+
+  /* routes */
+  function buildRoutes() {
+    var box = $("routeCards");
+    ROUTES.forEach(function (r) {
+      var c = el("article", "card route");
+      var head = el("div"); head.style.display = "flex"; head.style.gap = "10px"; head.style.alignItems = "center";
+      head.appendChild(el("div", "badge", String(r.n)));
+      var ht = el("div"); ht.appendChild(el("div", "note", "วันที่ " + r.n)); ht.appendChild(el("h3", null, r.title));
+      head.appendChild(ht); c.appendChild(head);
+      var meta = el("div", "meta"); meta.appendChild(el("span", "chip", r.km));
+      r.tags.forEach(function (t) { meta.appendChild(el("span", "chip " + t[1], t[0])); });
+      c.appendChild(meta);
+      var ol = el("ol", "tl"); r.labels.forEach(function (l) { ol.appendChild(el("li", null, l)); }); c.appendChild(ol);
+      var act = el("div", "actions");
+      var a1 = el("a", "btn primary", "เปิดเส้นทางเดินใน Google Maps"); a1.href = dirUrl(r.stops, false); a1.target = "_blank"; a1.rel = "noopener";
+      var a2 = el("a", "btn", "เริ่มจากตำแหน่งฉัน"); a2.href = dirUrl(r.stops, true); a2.target = "_blank"; a2.rel = "noopener";
+      act.appendChild(a1); act.appendChild(a2); c.appendChild(act);
+      box.appendChild(c);
+    });
+  }
+
+  /* places */
+  function buildFilters() {
+    var box = $("filters");
+    FILTERS.forEach(function (f) {
+      var b = el("button", "btn", f[1]); b.type = "button"; b.dataset.f = f[0];
+      b.addEventListener("click", function () { filter = f[0]; syncFilters(); renderPlaces(); });
+      box.appendChild(b);
+    });
+    syncFilters();
+    $("q").addEventListener("input", function (e) { query = e.target.value.trim().toLowerCase(); renderPlaces(); });
+  }
+  function syncFilters() {
+    Array.prototype.forEach.call($("filters").children, function (b) { b.setAttribute("aria-pressed", b.dataset.f === filter ? "true" : "false"); });
+  }
+  function renderPlaces() {
+    var box = $("placeList"); box.textContent = "";
+    var last = "", ul = null, shown = 0;
+    PLACES.forEach(function (p, i) {
+      if (filter === "todo") { if (done[p.n]) return; }
+      else if (filter !== "all" && p.t !== filter) return;
+      if (query && (p.n + " " + p.m).toLowerCase().indexOf(query) < 0) return;
+      if (p.g !== last) { box.appendChild(el("div", "grp", G[p.g])); ul = el("ul", "places"); box.appendChild(ul); last = p.g; }
+      var li = el("li", done[p.n] ? "done" : "");
+      var cb = el("input"); cb.type = "checkbox"; cb.id = "pl" + i; cb.checked = !!done[p.n];
+      var lb = el("label"); lb.htmlFor = cb.id;
+      lb.appendChild(el("div", "t", p.n)); lb.appendChild(el("div", "note", p.c));
+      var a = el("a", "map", "แผนที่ ↗"); a.href = searchUrl(p.m); a.target = "_blank"; a.rel = "noopener";
+      a.setAttribute("aria-label", "เปิด " + p.n + " ใน Google Maps");
+      if (done[p.n] && dates[p.n]) lb.appendChild(el("div", "when", "ไปแล้ว " + thDate(dates[p.n])));
+      cb.addEventListener("change", function () {
+        done[p.n] = cb.checked;
+        if (cb.checked && !dates[p.n]) dates[p.n] = todayIso();
+        save(); renderProgress(); renderPlaces();
+        if (window.CDMX_SYNC) window.CDMX_SYNC.place(p, cb.checked);
+      });
+      li.appendChild(cb); li.appendChild(lb); li.appendChild(a); ul.appendChild(li); shown++;
+    });
+    if (!shown) box.appendChild(el("p", "note", "ไม่มีรายการที่ตรงกับตัวกรองนี้"));
+  }
+  function renderProgress() {
+    var n = PLACES.filter(function (p) { return done[p.n]; }).length;
+    $("progress").style.width = (n / PLACES.length * 100) + "%";
+    $("progressTxt").textContent = "ไปแล้ว " + n + " จาก " + PLACES.length + " จุด";
+  }
+
+  /* budget */
+  function buildBudget() {
+    var box = $("presets");
+    PRESETS.forEach(function (p) {
+      var b = el("button", "btn"); b.type = "button"; b.dataset.id = p.id;
+      b.appendChild(el("span", null, p.name)); var s = el("span", null, p.sub); s.style.opacity = ".75"; s.style.fontSize = ".8rem"; b.appendChild(s);
+      b.addEventListener("click", function () { Object.assign(state, p.v); save(); renderBudget(); syncTrip(); });
+      box.appendChild(b);
+    });
+    ["countA", "costA", "countB", "costB", "months"].forEach(function (k) {
+      $(k).addEventListener("input", function () { state[k] = Number($(k).value); save(); renderBudget(); syncTrip(); });
+    });
+    ["freeCash", "goalThb", "rate"].forEach(function (k) {
+      $(k).addEventListener("input", function () {
+        var v = Number($(k).value || 0);
+        if (isFinite(v) && v >= 0) { state[k] = v; save(); renderBudget(true); syncTrip(); }
+      });
+    });
+  }
+  function renderBudget(skipInputs) {
+    var m = monthlyOf(state), total = m * state.months, thb = total * state.rate;
+    $("vA").textContent = state.countA + " ครั้ง";
+    $("vCostA").textContent = "$" + fmt(state.costA);
+    $("vB").textContent = state.countB + " ครั้ง";
+    $("vCostB").textContent = "$" + fmt(state.costB);
+    $("vM").textContent = state.months + " เดือน";
+    $("monthly").textContent = "$" + fmt(m);
+    $("total").textContent = "$" + fmt(total);
+    $("totalNote").textContent = "รวม " + state.months + " เดือน ≈ " + fmt(thb) + " บาท";
+    if (state.freeCash > 0) {
+      var pf = m / state.freeCash * 100;
+      $("pctFree").textContent = "เท่ากับ " + pf.toFixed(0) + "% ของเงินที่ใช้ได้ต่อเดือน";
+      $("meterFree").style.width = Math.min(100, pf) + "%";
+    } else { $("pctFree").textContent = "ใส่ \"เงินที่ใช้ได้ต่อเดือน\" เพื่อดูสัดส่วน"; $("meterFree").style.width = "0"; }
+    if (state.goalThb > 0) {
+      var pg = thb / state.goalThb * 100;
+      $("pctGoal").textContent = "ยอดรวมเท่ากับ " + pg.toFixed(0) + "% ของเป้าหมายที่ตั้งไว้";
+      $("meterGoal").style.width = Math.min(100, pg) + "%";
+    } else { $("pctGoal").textContent = "ใส่ \"เป้าหมายที่อยากเทียบ\" (เช่น เงินเก็บหรือหนี้) เพื่อดูสัดส่วน"; $("meterGoal").style.width = "0"; }
+
+    ["countA", "costA", "countB", "costB", "months"].forEach(function (k) { $(k).value = state[k]; });
+    if (!skipInputs) {
+      $("freeCash").value = state.freeCash || "";
+      $("goalThb").value = state.goalThb || "";
+      $("rate").value = state.rate;
+    }
+    Array.prototype.forEach.call($("presets").children, function (b) {
+      var p = PRESETS.filter(function (x) { return x.id === b.dataset.id; })[0];
+      var hit = Object.keys(p.v).every(function (k) { return state[k] === p.v[k]; }) && (p.v.countB !== undefined || state.countB === 0);
+      b.setAttribute("aria-pressed", hit ? "true" : "false");
+    });
+
+    var sc = PRESETS.map(function (p) { var s = Object.assign({}, state, { countB: 0 }, p.v); return { name: p.name, total: monthlyOf(s) * state.months }; });
+    var max = Math.max.apply(null, sc.map(function (x) { return x.total; })) || 1;
+    var bars = $("bars"); bars.textContent = "";
+    bars.appendChild(el("div", "note", "เทียบ 4 แบบ ที่ " + state.months + " เดือน"));
+    sc.forEach(function (x) {
+      var row = el("div", "b"); row.appendChild(el("span", null, x.name));
+      var mt = el("div", "meter"); var i = el("i"); i.style.width = (x.total / max * 100) + "%"; mt.appendChild(i); row.appendChild(mt);
+      row.appendChild(el("em", null, "$" + fmt(x.total))); bars.appendChild(row);
+    });
+  }
+
+  /* bridge for the sync module below: server data (mexico_state) replaces
+     what this page shows; local edits are pushed through window.CDMX_SYNC */
+  window.CDMX_APP = {
+    getLocal: function () { return { done: done, state: state }; },
+    setRemote: function (places, trip) {
+      PLACES.length = BASE_COUNT;
+      var byName = {};
+      (places || []).forEach(function (r) { if (r && r.name) byName[r.name] = r; });
+      var known = {};
+      PLACES.forEach(function (p) { known[p.n] = true; });
+      Object.keys(byName).forEach(function (n) {
+        var r = byName[n];
+        if (!known[n]) PLACES.push({ g: "X", t: "area", n: n, c: r.note || "", m: r.query || n });
+      });
+      done = {}; dates = {};
+      PLACES.forEach(function (p) {
+        var r = byName[p.n];
+        if (r && r.status === "been") { done[p.n] = true; if (r.date) dates[p.n] = r.date; }
+      });
+      if (trip && typeof trip === "object") state = Object.assign({}, DEFAULTS, trip);
+      save(); renderPlaces(); renderProgress(); renderBudget();
+    }
+  };
+
+  load();
+  buildRoutes();
+  buildFilters();
+  renderPlaces();
+  renderProgress();
+  buildBudget();
+  renderBudget();
+})();
+</script>
+<script type="module">
+/* Gmail sign-in (Firebase project kasion-dev, same as mexico/money.kasion.dev)
+   and sync of visited places + trip budget into the shared "mexico_state"
+   record. Every write re-reads the latest record first and changes only the
+   places / settings.trip it touched, so edits made in mexico.kasion.dev are kept. */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, onIdTokenChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+const auth = getAuth(initializeApp({"apiKey": "AIzaSyAfcV2cuPS5WXOEkNJX6ycN7STxinCdrH0", "authDomain": "kasion-dev.firebaseapp.com", "projectId": "kasion-dev", "storageBucket": "kasion-dev.firebasestorage.app", "messagingSenderId": "265232097586", "appId": "1:265232097586:web:0841b4094937bf2e83f72b"}));
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: "select_account" });
+const $ = (id) => document.getElementById(id);
+const API = "/api/kv/mexico_state";
+let user = null, owner = true, ops = [], timer = null, busy = false;
+
+function status(text, warn) { const s = $("syncTxt"); s.textContent = text; s.className = "sync" + (warn ? " warn" : ""); }
+const rid = () => Math.random().toString(36).slice(2, 10);
+const blank = () => ({ v: 1, homes: [], contacts: [], services: [], items: [], logs: [], places: [], settings: { rate: 0.5134 } });
+
+async function api(method, body) {
+  const token = await user.getIdToken();
+  const res = await fetch(API, {
+    method,
+    headers: { Authorization: "Bearer " + token, ...(body ? { "Content-Type": "application/json" } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  return res;
+}
+
+function applyOps(value, list) {
+  const st = value && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : blank();
+  st.places = Array.isArray(st.places) ? st.places : [];
+  st.settings = st.settings || {};
+  for (const op of list) {
+    if (op.type === "place") {
+      let r = st.places.find((x) => x.name === op.name);
+      if (!r) { r = { id: rid(), name: op.name, area: op.area || "X", query: op.query, status: "want" }; st.places.push(r); }
+      if (op.been) { r.status = "been"; r.date = r.date || op.date; } else { r.status = "want"; }
+      r.updatedAt = Date.now();
+    } else if (op.type === "trip") {
+      st.settings.trip = op.trip;
+    }
+  }
+  return st;
+}
+
+function queue(op) {
+  ops = ops.filter((o) => !(o.type === op.type && (op.type === "trip" || o.name === op.name)));
+  ops.push(op);
+  clearTimeout(timer);
+  timer = setTimeout(flush, 700);
+}
+
+async function flush() {
+  if (!user || !owner || busy || !ops.length) return;
+  busy = true;
+  const batch = ops; ops = [];
+  status("กำลังบันทึก…");
+  try {
+    const got = await api("GET");
+    if (!got.ok) throw new Error("get " + got.status);
+    const data = await got.json();
+    if (data.owner === false) { owner = false; status("บัญชีนี้ไม่ซิงก์ · เก็บในเครื่องนี้", true); return; }
+    const res = await api("PUT", applyOps(data.value, batch));
+    if (res.status === 403) { owner = false; status("บัญชีนี้ไม่ซิงก์ · เก็บในเครื่องนี้", true); return; }
+    if (!res.ok) throw new Error("put " + res.status);
+    status("ซิงก์แล้ว");
+  } catch (e) {
+    ops = batch.concat(ops);
+    status("ออฟไลน์ · จะลองใหม่", true);
+    setTimeout(flush, 5000);
+  } finally {
+    busy = false;
+    if (ops.length) { clearTimeout(timer); timer = setTimeout(flush, 300); }
+  }
+}
+
+window.CDMX_SYNC = {
+  place(p, been) { queue({ type: "place", name: p.n, area: p.g, query: p.m, been, date: new Date().toLocaleDateString("en-CA") }); },
+  trip(s) { queue({ type: "trip", trip: { ...s } }); },
+};
+
+async function pull(firstLoad) {
+  if (!user || ops.length || busy) return;
+  status("กำลังโหลด…");
+  try {
+    const res = await api("GET");
+    if (!res.ok) throw new Error("get " + res.status);
+    const data = await res.json();
+    if (data.owner === false) { owner = false; status("บัญชีนี้ไม่ซิงก์ · เก็บในเครื่องนี้", true); return; }
+    owner = true;
+    // One-time move of ticks / budget made on this browser before sign-in existed.
+    const flag = "cdmx_migrated_" + user.uid;
+    if (firstLoad && !localStorage.getItem(flag)) {
+      const local = window.CDMX_APP.getLocal();
+      const been = new Set(((data.value && data.value.places) || []).filter((r) => r.status === "been").map((r) => r.name));
+      Object.keys(local.done || {}).forEach((n) => { if (local.done[n] && !been.has(n)) ops.push({ type: "place", name: n, been: true, date: new Date().toLocaleDateString("en-CA") }); });
+      if (!(data.value && data.value.settings && data.value.settings.trip)) ops.push({ type: "trip", trip: { ...local.state } });
+      try { localStorage.setItem(flag, "1"); } catch (e) {}
+    }
+    const view = applyOps(data.value, ops);
+    window.CDMX_APP.setRemote(view.places, view.settings.trip);
+    status("ซิงก์แล้ว");
+    if (ops.length) flush();
+  } catch (e) {
+    status("โหลดไม่ได้ · ใช้ข้อมูลในเครื่อง", true);
+  }
+}
+
+$("signIn").addEventListener("click", async () => {
+  $("gateErr").textContent = "";
+  try { await signInWithPopup(auth, provider); }
+  catch (e) {
+    const code = (e && e.code) || "";
+    $("gateErr").textContent = code === "auth/unauthorized-domain"
+      ? "ยังไม่ได้เพิ่ม cdmx.kasion.dev ใน Firebase Authorized domains"
+      : "เข้าสู่ระบบไม่สำเร็จ: " + (code || (e && e.message) || "unknown");
+  }
+});
+$("signOut").addEventListener("click", () => signOut(auth));
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pull(false); });
+
+onIdTokenChanged(auth, (u) => {
+  const was = user && user.uid;
+  user = u;
+  $("signIn").disabled = false;
+  document.body.classList.toggle("locked", !u);
+  $("acct").classList.toggle("on", !!u);
+  if (u) {
+    $("acctImg").hidden = !u.photoURL;
+    if (u.photoURL) $("acctImg").src = u.photoURL;
+    $("acctImg").title = u.email || "";
+    if (was !== u.uid) pull(true);
+  }
+});
+</script>
+</body>
+</html>
