@@ -561,9 +561,26 @@ function applyOps(value, list) {
   return st;
 }
 
+// Unsent edits are mirrored to localStorage (per uid) so a tick survives the
+// tab being hidden, closed or killed before the 700ms send fires; they are
+// replayed on the next sign-in load.
+let inflight = [];
+const pendKey = () => (user ? "cdmx_pending_" + user.uid : null);
+function sameTarget(a, b) { return a.type === b.type && (a.type === "trip" || a.name === b.name); }
+function mergeOps(list, op) { return list.filter((o) => !sameTarget(o, op)).concat([op]); }
+function savePending() {
+  const k = pendKey(); if (!k) return;
+  const all = inflight.concat(ops);
+  try { all.length ? localStorage.setItem(k, JSON.stringify(all)) : localStorage.removeItem(k); } catch (e) {}
+}
+function loadPending() {
+  const k = pendKey(); if (!k) return [];
+  try { const v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+}
+
 function queue(op) {
-  ops = ops.filter((o) => !(o.type === op.type && (op.type === "trip" || o.name === op.name)));
-  ops.push(op);
+  ops = mergeOps(ops, op);
+  savePending();
   clearTimeout(timer);
   timer = setTimeout(flush, 700);
 }
@@ -571,7 +588,9 @@ function queue(op) {
 async function flush() {
   if (!user || !owner || busy || !ops.length) return;
   busy = true;
-  const batch = ops; ops = [];
+  clearTimeout(timer);
+  const batch = ops; ops = []; inflight = batch;
+  let failed = false;
   status("กำลังบันทึก…");
   try {
     const got = await api("GET");
@@ -581,14 +600,21 @@ async function flush() {
     const res = await api("PUT", applyOps(data.value, batch));
     if (res.status === 403) { owner = false; status("บัญชีนี้ไม่ซิงก์ · เก็บในเครื่องนี้", true); return; }
     if (!res.ok) throw new Error("put " + res.status);
+    inflight = [];
     status("ซิงก์แล้ว");
   } catch (e) {
-    ops = batch.concat(ops);
+    // Put the batch back in front; newer edits to the same place/trip win.
+    let merged = batch;
+    ops.forEach((o) => { merged = mergeOps(merged, o); });
+    ops = merged; inflight = [];
+    failed = true;
     status("ออฟไลน์ · จะลองใหม่", true);
-    setTimeout(flush, 5000);
   } finally {
     busy = false;
-    if (ops.length) { clearTimeout(timer); timer = setTimeout(flush, 300); }
+    if (!owner) { ops = []; inflight = []; }
+    savePending();
+    // One retry timer only: 5s after a failure, quickly if edits arrived meanwhile.
+    if (ops.length && owner) { clearTimeout(timer); timer = setTimeout(flush, failed ? 5000 : 300); }
   }
 }
 
@@ -615,6 +641,8 @@ async function pull(firstLoad) {
       if (!(data.value && data.value.settings && data.value.settings.trip)) ops.push({ type: "trip", trip: { ...local.state } });
       try { localStorage.setItem(flag, "1"); } catch (e) {}
     }
+    // Edits that never reached the server last time (tab hidden/closed).
+    if (firstLoad) loadPending().forEach((o) => { ops = mergeOps(ops, o); });
     const view = applyOps(data.value, ops);
     window.CDMX_APP.setRemote(view.places, view.settings.trip);
     status("ซิงก์แล้ว");
@@ -635,7 +663,11 @@ $("signIn").addEventListener("click", async () => {
   }
 });
 $("signOut").addEventListener("click", () => signOut(auth));
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") pull(false); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") pull(false);
+  else if (ops.length) flush(); // send now instead of waiting; localStorage keeps a copy if this is cut off
+});
+window.addEventListener("pagehide", () => { if (ops.length) flush(); });
 
 onIdTokenChanged(auth, (u) => {
   const was = user && user.uid;
